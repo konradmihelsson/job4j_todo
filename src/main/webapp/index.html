@@ -17,97 +17,9 @@
             integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
             crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script>
-        function getItems(param) {
-            $.ajax({
-                type: 'GET',
-                url: 'http://localhost:8080/todo/items?param=' + param,
-                dataType: 'json'
-            }).done(function (data) {
-                var item = '';
-                $.each(data, function (key, value) {
-                    item += '<tr>';
-                    item += '<td>' +
-                        value.id + '</td>';
-                    item += '<td>' +
-                        value.description + '</td>';
-                    item += '<td>' +
-                        value.created + '</td>';
-                    if (value.done === true) {
-                        item += '<td><input type="checkbox" checked="checked" ' +
-                            'onclick="editItem($(this));" id="checkbox-' + value.id + '"></td>';
-                    } else {
-                        item += '<td><input type="checkbox" ' +
-                            'onclick="editItem($(this));" id="checkbox-' + value.id + '"></td>';
-                    }
-                    item += '</tr>';
-                });
-                $('#table').append(item);
-            }).fail(function (err) {
-                console.log(err);
-            });
-        }
-    </script>
+    <script src="scripts/index.js"></script>
     <script>
         $(document).ready(getItems('undone'));
-    </script>
-    <script>
-        function clearTable(){
-            var table = document.getElementById("table");
-            while(table.rows.length > 1) {
-                table.deleteRow(1);
-            }
-        }
-    </script>
-    <script>
-        function unDoneOnlySwitch(t) {
-            if (t.is(':checked')) {
-                clearTable();
-                getItems('all');
-            } else {
-                clearTable();
-                getItems('undone');
-            }
-        }
-    </script>
-    <script>
-        function editItem(t) {
-            $.ajax({
-                type: 'POST',
-                url: 'http://localhost:8080/todo/edit?id=' + t.attr('id'),
-            }).done(function () {
-                unDoneOnlySwitch($("#checkbox"));
-            }).fail(function (err) {
-                console.log(err);
-            });
-        }
-    </script>
-    <script>
-        function addItem() {
-            $.ajax({
-                type: 'POST',
-                url: 'http://localhost:8080/todo/items',
-                data: JSON.stringify({
-                    description: $('#inputName').val()
-                }),
-                dataType: 'json'
-            }).done(function (data) {
-                var item = '';
-                item += '<tr>';
-                item += '<td>' +
-                    data.id + '</td>';
-                item += '<td>' +
-                    data.description + '</td>';
-                item += '<td>' +
-                    data.created + '</td>';
-                item += '<td><input type="checkbox" ' +
-                    'onclick="editItem($(this));" id="checkbox-' + data.id + '"></td>';
-                item += '</tr>';
-                $('#table').append(item);
-            }).fail(function (err) {
-                console.log(err);
-            });
-        }
     </script>
     <title>TODO list</title>
 </head>

@@ -15,6 +15,17 @@ public class HbnStore implements AutoCloseable {
     private final SessionFactory sf = new MetadataSources(registry)
             .buildMetadata().buildSessionFactory();
 
+    private HbnStore() {
+    }
+
+    private static final class Lazy {
+        private static final HbnStore INST = new HbnStore();
+    }
+
+    public static HbnStore instOf() {
+        return Lazy.INST;
+    }
+
     public void add(Item item) {
         Session session = sf.openSession();
         session.beginTransaction();

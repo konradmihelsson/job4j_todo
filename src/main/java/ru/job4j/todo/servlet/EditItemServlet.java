@@ -12,10 +12,6 @@ public class EditItemServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         String param = req.getParameter("id");
         int id = Integer.parseInt(param.split("-")[1]);
-        try (HbnStore store = new HbnStore()) {
-            store.changeIsDoneFlag(id);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        HbnStore.instOf().changeIsDoneFlag(id);
     }
 }

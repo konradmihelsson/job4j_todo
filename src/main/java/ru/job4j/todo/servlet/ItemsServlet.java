@@ -13,7 +13,6 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ItemsServlet extends HttpServlet {
@@ -24,11 +23,7 @@ public class ItemsServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Item item = GSON.fromJson(req.getReader(), Item.class);
         item.setCreated(Timestamp.from(Instant.now()));
-        try (HbnStore store = new HbnStore()) {
-            store.add(item);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        HbnStore.instOf().add(item);
         resp.setContentType("application/json; charset=utf-8");
         OutputStream output = resp.getOutputStream();
         String json = GSON.toJson(item);
@@ -42,16 +37,11 @@ public class ItemsServlet extends HttpServlet {
         resp.setContentType("application/json; charset=utf-8");
         OutputStream output = resp.getOutputStream();
         String param = req.getParameter("param");
-        List<Item> items = new ArrayList<>();
-        try (HbnStore store = new HbnStore()) {
-            if ("all".equals(param)) {
-                items = store.findAll();
-            } else if ("undone".equals(param)) {
-                items = store.findNotDone();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        List<Item> items = switch (param) {
+            case "all" -> HbnStore.instOf().findAll();
+            case "undone" -> HbnStore.instOf().findNotDone();
+            default -> throw new IllegalArgumentException("Arguments 'all', 'undone' only!");
+        };
         String json = GSON.toJson(items);
         output.write(json.getBytes(StandardCharsets.UTF_8));
         output.flush();
