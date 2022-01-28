@@ -6,6 +6,7 @@ import org.hibernate.Transaction;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.query.Query;
 import ru.job4j.todo.model.Item;
 
 import java.util.List;
@@ -48,14 +49,13 @@ public class HbnStore implements AutoCloseable {
     }
 
     public void changeIsDoneFlag(int id) {
-        this.tx(session -> {
-            Item persistentInstance = session.get(Item.class, id);
-            if (persistentInstance != null) {
-                persistentInstance.setDone(!persistentInstance.isDone());
-                session.update(persistentInstance);
-            }
-            return  persistentInstance;
-        });
+        this.tx(
+                session -> {
+                    Query query = session.createQuery("update ru.job4j.todo.model.Item i set i.done = true where i.id = :id");
+                    query.setParameter("id", id);
+                    return query.executeUpdate();
+                }
+        );
     }
 
     public List<Item> findAll() {
