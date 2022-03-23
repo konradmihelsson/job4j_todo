@@ -8,6 +8,7 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.query.Query;
 import ru.job4j.todo.model.Item;
+import ru.job4j.todo.model.User;
 
 import java.util.List;
 import java.util.function.Function;
@@ -51,24 +52,49 @@ public class HbnStore implements AutoCloseable {
     public void changeIsDoneFlag(int id) {
         this.tx(
                 session -> {
-                    Query query = session.createQuery("update ru.job4j.todo.model.Item i set i.done = true where i.id = :id");
+                    Query query = session.
+                            createQuery("update ru.job4j.todo.model.Item i set i.done = true where i.id = :id");
                     query.setParameter("id", id);
                     return query.executeUpdate();
                 }
         );
     }
 
-    public List<Item> findAll() {
+    public List<Item> findAll(User user) {
         return this.tx(
-                session -> session.
-                        createQuery("from ru.job4j.todo.model.Item i ORDER BY i.id").list()
+                session -> {
+                    Query query = session.
+                            createQuery("from ru.job4j.todo.model.Item i where i.user.id = :id ORDER BY i.id");
+                    query.setParameter("id", user.getId());
+                    return query.list();
+                }
         );
     }
 
-    public List<Item> findNotDone() {
+    public List<Item> findNotDone(User user) {
         return this.tx(
-                session -> session
-                        .createQuery("from ru.job4j.todo.model.Item i where done=false ORDER BY i.id").list()
+                session -> {
+                    Query query = session.
+                            createQuery("from ru.job4j.todo.model.Item i "
+                                    + "where i.user.id = :id AND done=false ORDER BY i.id");
+                    query.setParameter("id", user.getId());
+                    return query.list();
+                }
+        );
+    }
+
+    public void add(User user) {
+        this.tx(session -> session.save(user));
+    }
+
+    public User findUserByEmail(String email) {
+        return this.tx(
+                session -> {
+                    Query query = session.
+                            createQuery("from ru.job4j.todo.model.User where email = :email");
+                    query.setParameter("email", email);
+                    return (User) query.uniqueResult();
+                }
         );
     }
 

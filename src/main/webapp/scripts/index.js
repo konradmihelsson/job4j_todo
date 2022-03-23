@@ -18,6 +18,8 @@ function getItems(param) {
                 value.description + '</td>';
             item += '<td>' +
                 value.created + '</td>';
+            item += '<td>' +
+                value.user.email + '</td>';
             if (value.done === true) {
                 item += '<td><input type="checkbox" checked="checked" ' +
                     'onclick="editItem($(this));" id="checkbox-' + value.id + '"></td>';
@@ -95,6 +97,8 @@ function addItem() {
             data.description + '</td>';
         item += '<td>' +
             data.created + '</td>';
+        item += '<td>' +
+            data.user.email + '</td>';
         item += '<td><input type="checkbox" ' +
             'onclick="editItem($(this));" id="checkbox-' + data.id + '"></td>';
         item += '</tr>';
